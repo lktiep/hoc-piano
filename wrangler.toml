@@ -1,0 +1,5 @@
+# Cau hinh trien khai len Cloudflare Pages.
+#   npm run deploy      -> dung ban chay that roi day len
+name = "hoc-piano"
+compatibility_date = "2026-08-18"
+pages_build_output_dir = "dist"

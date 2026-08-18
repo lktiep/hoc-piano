@@ -161,9 +161,23 @@ Cả hai chạy tự động trên GitHub Actions ở mỗi lần push.
 
 ## Xuất bản
 
-Đã cấu hình sẵn GitHub Pages (`.github/workflows/deploy.yml`). Push lên nhánh
-`main` là tự kiểm thử → dựng → xuất bản. Trong repo, vào
-**Settings → Pages → Source: GitHub Actions** một lần duy nhất.
+Trang đang chạy ở hai nơi:
+
+| Nơi | Link | Cách cập nhật |
+| --- | --- | --- |
+| **Cloudflare Pages** | https://hoc-piano.pages.dev | `npm run deploy` |
+| **GitHub Pages** | https://lktiep.github.io/hoc-piano/ | tự động mỗi lần `git push` |
+
+**Cloudflare Pages** — cấu hình trong `wrangler.toml`, tiêu đề cache trong `public/_headers`.
+Lần đầu trên máy mới cần `npx wrangler login` một lần, sau đó chỉ cần:
+
+```bash
+npm run deploy     # dựng lại rồi đẩy lên
+```
+
+**GitHub Pages** — `.github/workflows/deploy.yml` tự chạy typecheck → test → build →
+xuất bản mỗi lần push lên `main`. Trong repo cần đặt **Settings → Pages → Source:
+GitHub Actions** một lần duy nhất (đã đặt rồi).
 
 Vì `vite.config.ts` đặt `base: './'` nên bản dựng chạy được ở bất kỳ thư mục con nào —
 kể cả mở thẳng `dist/index.html` bằng trình duyệt, hoặc đặt lên bất kỳ máy chủ tĩnh nào.

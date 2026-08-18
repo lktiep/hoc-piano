@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "deploy": "npm run build && npx --yes wrangler@4 pages deploy",
     "typecheck": "tsc --noEmit",
     "songs": "node scripts/make-starter-songs.mjs",
     "import": "tsx scripts/import-score.ts",

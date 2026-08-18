@@ -1,0 +1,11 @@
+# Tep bundle co van tay trong ten -> cache vinh vien
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Kho bai co the doi -> cache ngan
+/songs/*
+  Cache-Control: public, max-age=300, must-revalidate
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
