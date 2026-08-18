@@ -1,0 +1,35 @@
+{
+  "name": "hoc-piano",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Trang tap dan piano don gian cho be",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "songs": "node scripts/make-starter-songs.mjs",
+    "import": "tsx scripts/import-score.ts",
+    "test": "tsx scripts/selftest.ts && tsx scripts/uitest.ts",
+    "test:core": "tsx scripts/selftest.ts",
+    "test:ui": "tsx scripts/uitest.ts"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "@xmldom/xmldom": "^0.9.8",
+    "jsdom": "^28.1.0",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.0"
+  }
+}

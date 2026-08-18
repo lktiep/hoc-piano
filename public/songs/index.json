@@ -1,0 +1,58 @@
+[
+  {
+    "id": "ngoi-sao-lap-lanh",
+    "title": "Ngôi sao lấp lánh",
+    "artist": "Dân ca Pháp",
+    "level": 1,
+    "file": "ngoi-sao-lap-lanh.json"
+  },
+  {
+    "id": "mary-co-con-cuu-nho",
+    "title": "Mary có con cừu nhỏ",
+    "artist": "Đồng dao Anh",
+    "level": 1,
+    "file": "mary-co-con-cuu-nho.json"
+  },
+  {
+    "id": "kia-con-buom-vang",
+    "title": "Kìa con bướm vàng",
+    "artist": "Dân ca (Frère Jacques)",
+    "level": 1,
+    "file": "kia-con-buom-vang.json"
+  },
+  {
+    "id": "khuc-hoan-ca",
+    "title": "Khúc hoan ca (Ode to Joy)",
+    "artist": "L. van Beethoven",
+    "level": 2,
+    "file": "khuc-hoan-ca.json"
+  },
+  {
+    "id": "jingle-bells",
+    "title": "Jingle Bells (điệp khúc)",
+    "artist": "J. Pierpont",
+    "level": 2,
+    "file": "jingle-bells.json"
+  },
+  {
+    "id": "chuc-mung-sinh-nhat",
+    "title": "Chúc mừng sinh nhật",
+    "artist": "Dân ca",
+    "level": 2,
+    "file": "chuc-mung-sinh-nhat.json"
+  },
+  {
+    "id": "fur-elise",
+    "title": "Für Elise (đoạn mở đầu)",
+    "artist": "L. van Beethoven",
+    "level": 4,
+    "file": "fur-elise.json"
+  },
+  {
+    "id": "thang-am-do-truong",
+    "title": "Gam Đô trưởng (luyện ngón)",
+    "artist": "Bài luyện tập",
+    "level": 1,
+    "file": "thang-am-do-truong.json"
+  }
+]
