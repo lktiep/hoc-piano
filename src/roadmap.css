@@ -1,0 +1,211 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Lo trinh — theo ban thiet ke "Lo Trinh.dc.html".
+
+   Ba chang xep doc, moi chang mot luoi the. Ban thiet ke ve o khoa cho cac
+   bai chua toi luot; o day khong khoa gi ca — be muon mo bai nao cung duoc,
+   dau tick chi ghi lai bai da choi xong that.
+   Tien to `rm-` (roadmap).
+   ══════════════════════════════════════════════════════════════════════ */
+
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ------------------------------------------------------------------ thanh tien do */
+
+.rm-progress {
+  width: 260px;
+  max-width: 100%;
+  height: 8px;
+  background: var(--n-200);
+  margin-top: 10px;
+  margin-left: auto;
+}
+.rm-progress i {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+/* ------------------------------------------------------------------ chang */
+
+.rm-body {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--pad-x) 56px;
+  flex: 1;
+}
+
+.rm-stage {
+  border-top: 1px solid var(--line);
+  padding: 28px 0 36px;
+}
+
+.rm-stage-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.rm-stage-num {
+  font-family: var(--font-h);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-accent);
+  line-height: 1;
+  flex: none;
+}
+.rm-stage h2 {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0;
+}
+.rm-stage-sub {
+  font-size: 13px;
+  color: var(--n-600);
+}
+.rm-stage-count {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--n-500);
+  white-space: nowrap;
+}
+
+.rm-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* ------------------------------------------------------------------ the bai */
+
+.rm-card {
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--color-text);
+  font-family: var(--font-b);
+  text-align: left;
+  padding: 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 132px;
+  animation: hm-rise 0.5s ease both;
+}
+.rm-card:hover {
+  border-color: var(--color-accent);
+  background: var(--n-100);
+}
+.rm-card.is-current {
+  border-color: var(--color-accent);
+}
+
+.rm-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.rm-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+}
+.rm-check {
+  width: 18px;
+  height: 18px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  flex: none;
+}
+.rm-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+.rm-card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+}
+.rm-card-meta {
+  font-size: 12px;
+  color: var(--n-600);
+  margin-top: auto;
+  letter-spacing: 0.02em;
+}
+
+.rm-empty {
+  border: 1px dashed var(--line);
+  padding: 22px;
+  font-size: 13px;
+  color: var(--n-500);
+  grid-column: 1 / -1;
+}
+
+/* ------------------------------------------------------------------ ket */
+
+.rm-outro {
+  border-top: 1px solid var(--line);
+  padding: 28px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.rm-outro p {
+  margin: 0;
+  color: var(--n-600);
+  font-size: 14px;
+  max-width: 560px;
+}
+.rm-reset {
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------------------ man hinh nho */
+
+@media (max-width: 1080px) {
+  .rm-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .rm-grid {
+    grid-template-columns: 1fr;
+  }
+  .rm-stage-count {
+    margin-left: 0;
+    width: 100%;
+  }
+  /* Man hinh hep: thanh tien do keo het be ngang cho de nhin. */
+  .hm-head-side {
+    width: 100%;
+    text-align: left;
+  }
+  .rm-progress {
+    width: 100%;
+    margin-left: 0;
+  }
+  .rm-reset {
+    margin-left: 0;
+  }
+}

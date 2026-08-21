@@ -14,6 +14,7 @@ import { DOMParser } from '@xmldom/xmldom'
 import { parseMusicXml, slugify } from '../src/music/musicxml'
 import { extractMxl, validateSong } from '../src/music/importSong'
 import { midiToSong, parseMidiFile } from '../src/music/midiFile'
+import { Timeline } from '../src/engine/timeline'
 import type { Song, SongIndexEntry } from '../src/types'
 import type { XEl } from '../src/music/xmlutil'
 
@@ -24,6 +25,7 @@ interface Args {
   artist?: string
   source?: string
   level?: number
+  genre?: string
   noRepeats?: boolean
   dry?: boolean
 }
@@ -47,6 +49,9 @@ function parseArgs(argv: string[]): Args {
         break
       case '--level':
         a.level = parseInt(argv[++i], 10)
+        break
+      case '--genre':
+        a.genre = argv[++i]
         break
       case '--no-repeats':
         a.noRepeats = true
@@ -72,6 +77,7 @@ Tuy chon:
   --id ten-file         ma bai (mac dinh: sinh tu ten bai)
   --source <url>        link MuseScore goc, luu lai de tra cuu
   --level 1..5          do kho, hien trong danh sach chon bai
+  --genre "CỔ ĐIỂN"     the loai, dung de loc trong thu vien
   --no-repeats          KHONG trai dau nhac lai
   --dry                 chi in ket qua, khong ghi tep`)
   process.exit(1)
@@ -115,6 +121,7 @@ if (args.title) song.title = args.title
 if (args.artist) song.artist = args.artist
 if (args.source) song.source = args.source
 if (args.level) song.level = args.level
+if (args.genre) song.genre = args.genre
 song.id = args.id || song.id || slugify(song.title)
 
 const beats = song.notes.reduce((mx, n) => Math.max(mx, n.t + n.d), 0)
@@ -139,7 +146,15 @@ writeFileSync(join(dir, file), JSON.stringify(song, null, 1) + '\n', 'utf8')
 
 const indexPath = join(dir, 'index.json')
 const index: SongIndexEntry[] = existsSync(indexPath) ? JSON.parse(readFileSync(indexPath, 'utf8')) : []
-const entry: SongIndexEntry = { id: song.id, title: song.title, artist: song.artist, level: song.level, file }
+const entry: SongIndexEntry = {
+  id: song.id,
+  title: song.title,
+  artist: song.artist,
+  level: song.level,
+  genre: song.genre,
+  seconds: Math.round(new Timeline(song).beatToSec(beats)),
+  file,
+}
 const at = index.findIndex((e) => e.id === song.id)
 if (at >= 0) index[at] = entry
 else index.push(entry)

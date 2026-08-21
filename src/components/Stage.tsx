@@ -1,6 +1,13 @@
 /**
  * Man hinh choi: not nhac roi xuong + ban phim dan, ve chung tren MOT canvas
  * de 2 phan khop nhau tuyet doi va chay muot 60fps.
+ *
+ * Mau va hinh khoi theo he Modernist cua ban thiet ke: goc vuong tuyet doi,
+ * mot mau nhan duy nhat, tay trai ve mau trang. Rieng ban phim giu dung mau
+ * that cua phim dan de be doi chieu voi cay dan o nha.
+ *
+ * O che do "ban nhac" (settings.view === 'sheet') khung nay chi con ban phim:
+ * vong ve o day cung la thu goi player.tick(), nen no phai o lai ca hai che do.
  */
 
 import { useCallback, useEffect, useRef } from 'react'
@@ -9,16 +16,20 @@ import type { Settings } from '../types'
 import { buildLayout, keyAt, BLACK_HEIGHT_RATIO, type KeyboardLayout } from '../music/layout'
 import { isBlackKey, keyLabel, octaveOf, pitchClass } from '../music/notes'
 
-const C_WHITE = '#f6f8fc'
-const C_WHITE_EDGE = '#b9c4d6'
-const C_BLACK = '#20283a'
-const C_BLACK_EDGE = '#0b0f1a'
-const C_RIGHT = '#f59e0b'
-const C_RIGHT_LIGHT = '#fcd34d'
-const C_LEFT = '#38bdf8'
-const C_LEFT_LIGHT = '#93ddfd'
-const C_HINT = '#22c55e'
-const C_WRONG = '#ef4444'
+const FONT = 'Archivo, ui-sans-serif, system-ui, sans-serif'
+
+const C_BG = '#131211'
+const C_WHITE = '#f6f4f3'
+const C_WHITE_EDGE = 'rgba(11,10,9,0.5)'
+const C_BLACK = '#0b0a09'
+const C_BLACK_EDGE = '#000000'
+/** Tay phai = mau nhan, tay trai = trang. Hai tay khong bao gio lan mau. */
+const C_RIGHT = '#ec3013'
+const C_RIGHT_LIGHT = '#ff5a3d'
+const C_LEFT = '#b3aeab'
+const C_LEFT_LIGHT = '#efedec'
+const C_HINT = '#ec3013'
+const C_PRESSED = '#ff7a5c'
 
 export interface StageProps {
   player: Player
@@ -41,6 +52,8 @@ export function Stage({ player, settings, range, onUiTick }: StageProps) {
   settingsRef.current = settings
   rangeRef.current = range
 
+  const keysOnly = settings.view === 'sheet'
+
   // ------------------------------------------------------------- kich thuoc
   const resize = useCallback(() => {
     const wrap = wrapRef.current
@@ -49,15 +62,16 @@ export function Stage({ player, settings, range, onUiTick }: StageProps) {
     const rect = wrap.getBoundingClientRect()
     const dpr = Math.min(2.5, window.devicePixelRatio || 1)
     const w = Math.max(320, Math.floor(rect.width))
-    const h = Math.max(260, Math.floor(rect.height))
+    const h = Math.max(120, Math.floor(rect.height))
     sizeRef.current = { w, h, dpr }
     canvas.width = Math.floor(w * dpr)
     canvas.height = Math.floor(h * dpr)
     canvas.style.width = `${w}px`
     canvas.style.height = `${h}px`
-    const kbH = Math.round(Math.min(Math.max(h * 0.42, 160), 340))
-    kbHeightRef.current = kbH
-    kbTopRef.current = h - kbH
+    // Che do ban nhac: ca khung la ban phim. Che do not roi: chua toi mot nua.
+    const kbH = settingsRef.current.view === 'sheet' ? h : Math.round(Math.min(Math.max(h * 0.42, 160), 340))
+    kbHeightRef.current = Math.min(h, kbH)
+    kbTopRef.current = h - kbHeightRef.current
     layoutRef.current = buildLayout(rangeRef.current[0], rangeRef.current[1], w)
   }, [])
 
@@ -73,6 +87,11 @@ export function Stage({ player, settings, range, onUiTick }: StageProps) {
       window.removeEventListener('orientationchange', resize)
     }
   }, [resize])
+
+  // Doi cach nhin thi chia lai khung ngay, khong doi ResizeObserver.
+  useEffect(() => {
+    resize()
+  }, [resize, keysOnly])
 
   useEffect(() => {
     const { w } = sizeRef.current
@@ -134,7 +153,7 @@ export function Stage({ player, settings, range, onUiTick }: StageProps) {
   }
 
   return (
-    <div className="stage" ref={wrapRef}>
+    <div className={`stage${keysOnly ? ' is-keys-only' : ''}`} ref={wrapRef}>
       <canvas
         ref={canvasRef}
         className="stage-canvas"
@@ -149,24 +168,6 @@ export function Stage({ player, settings, range, onUiTick }: StageProps) {
 }
 
 // ------------------------------------------------------------------- ve canvas
-
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  const rr = Math.max(0, Math.min(r, w / 2, h / 2))
-  ctx.beginPath()
-  if (typeof ctx.roundRect === 'function') ctx.roundRect(x, y, w, h, rr)
-  else {
-    ctx.moveTo(x + rr, y)
-    ctx.lineTo(x + w - rr, y)
-    ctx.quadraticCurveTo(x + w, y, x + w, y + rr)
-    ctx.lineTo(x + w, y + h - rr)
-    ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h)
-    ctx.lineTo(x + rr, y + h)
-    ctx.quadraticCurveTo(x, y + h, x, y + h - rr)
-    ctx.lineTo(x, y + rr)
-    ctx.quadraticCurveTo(x, y, x + rr, y)
-    ctx.closePath()
-  }
-}
 
 function draw(
   canvas: HTMLCanvasElement | null,
@@ -186,36 +187,33 @@ function draw(
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   ctx.clearRect(0, 0, w, h)
 
-  const bg = ctx.createLinearGradient(0, 0, 0, kbTop)
-  bg.addColorStop(0, '#0a0f1d')
-  bg.addColorStop(1, '#151d33')
-  ctx.fillStyle = bg
-  ctx.fillRect(0, 0, w, kbTop)
+  // Khong con cho cho not roi (che do ban nhac): chi ve ban phim.
+  if (kbTop > 4) {
+    ctx.fillStyle = C_BG
+    ctx.fillRect(0, 0, w, kbTop)
 
-  const pos = player.posBeat
-  const lookahead = Math.max(2, settings.lookaheadBeats)
-  const pxPerBeat = kbTop / lookahead
+    const pos = player.posBeat
+    const lookahead = Math.max(2, settings.lookaheadBeats)
+    const pxPerBeat = kbTop / lookahead
 
-  drawLanes(ctx, layout, kbTop)
-  drawGrid(ctx, player, pos, lookahead, pxPerBeat, kbTop, w)
-  drawNotes(ctx, player, settings, layout, pos, lookahead, pxPerBeat, kbTop)
-  drawNowLine(ctx, w, kbTop, player)
+    drawLanes(ctx, layout, kbTop)
+    drawGrid(ctx, player, pos, lookahead, pxPerBeat, kbTop, w)
+    drawNotes(ctx, player, settings, layout, pos, lookahead, pxPerBeat, kbTop)
+    drawNowLine(ctx, w, kbTop, player)
+  }
+
   drawKeyboard(ctx, layout, kbTop, kbHeight, player, settings, now)
-  drawOverlay(ctx, w, kbTop, player)
+
+  if (kbTop > 4) drawOverlay(ctx, w, kbTop, player)
 }
 
 /** Vien mo phan chia cac phim de mat de doi chieu not voi phim. */
 function drawLanes(ctx: CanvasRenderingContext2D, layout: KeyboardLayout, kbTop: number) {
   ctx.save()
-  ctx.strokeStyle = 'rgba(255,255,255,0.045)'
   ctx.lineWidth = 1
   for (const k of layout.keys) {
     if (k.black) continue
-    if (pitchClass(k.midi) === 0) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.13)'
-    } else {
-      ctx.strokeStyle = 'rgba(255,255,255,0.045)'
-    }
+    ctx.strokeStyle = pitchClass(k.midi) === 0 ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.05)'
     ctx.beginPath()
     ctx.moveTo(Math.round(k.x) + 0.5, 0)
     ctx.lineTo(Math.round(k.x) + 0.5, kbTop)
@@ -236,20 +234,20 @@ function drawGrid(
   const tl = player.timeline
   if (!tl) return
   ctx.save()
-  ctx.font = '600 11px ui-sans-serif, system-ui, sans-serif'
+  ctx.font = `700 10px ${FONT}`
   ctx.textBaseline = 'bottom'
   for (const g of tl.beatGrid(pos - 1, pos + lookahead + 1)) {
     const y = kbTop - (g.beat - pos) * pxPerBeat
     if (y < -20 || y > kbTop) continue
-    ctx.strokeStyle = g.strong ? 'rgba(148,180,255,0.30)' : 'rgba(148,180,255,0.10)'
-    ctx.lineWidth = g.strong ? 1.5 : 1
+    ctx.strokeStyle = g.strong ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.07)'
+    ctx.lineWidth = 1
     ctx.beginPath()
     ctx.moveTo(0, Math.round(y) + 0.5)
     ctx.lineTo(w, Math.round(y) + 0.5)
     ctx.stroke()
     if (g.strong) {
-      ctx.fillStyle = 'rgba(148,180,255,0.55)'
-      ctx.fillText(String(tl.measureAt(g.beat)), 6, y - 3)
+      ctx.fillStyle = 'rgba(255,255,255,0.42)'
+      ctx.fillText(String(tl.measureAt(g.beat)), 6, y - 4)
     }
   }
   ctx.restore()
@@ -310,49 +308,44 @@ function drawNotes(
 
     let base = n.h === 'R' ? C_RIGHT : C_LEFT
     let light = n.h === 'R' ? C_RIGHT_LIGHT : C_LEFT_LIGHT
+    // Phan may tu danh: van thay duoc nhung mo han, de be khong bam nham.
     if (!n.required && settings.mode !== 'listen') {
-      base = n.h === 'R' ? '#8a6a2a' : '#2b6182'
-      light = n.h === 'R' ? '#b08c3f' : '#3d7ea3'
+      base = n.h === 'R' ? '#7a2415' : '#5c5956'
+      light = n.h === 'R' ? '#9c3320' : '#787471'
     }
-    if (done) ctx.globalAlpha = 0.35
-
-    if (isNext && player.waiting) {
-      const pulse = 0.55 + 0.45 * Math.sin(performance.now() / 160)
-      ctx.shadowColor = C_HINT
-      ctx.shadowBlur = 14 + 10 * pulse
-    }
+    if (done) ctx.globalAlpha = 0.3
 
     const grad = ctx.createLinearGradient(x, top, x, bottom)
     grad.addColorStop(0, light)
     grad.addColorStop(1, base)
     ctx.fillStyle = grad
-    roundRect(ctx, x, top, wNote, height, Math.min(8, wNote / 2))
-    ctx.fill()
-    ctx.shadowBlur = 0
+    ctx.fillRect(x, top, wNote, height)
 
-    ctx.strokeStyle = isNext ? C_HINT : 'rgba(0,0,0,0.35)'
-    ctx.lineWidth = isNext ? 2.5 : 1
-    roundRect(ctx, x, top, wNote, height, Math.min(8, wNote / 2))
-    ctx.stroke()
+    // Not sap toi: vien trang day, nhay nhe khi bai dang dung cho be
+    if (isNext) {
+      ctx.strokeStyle = '#ffffff'
+      ctx.lineWidth = player.waiting ? 3 : 2
+      ctx.globalAlpha = player.waiting ? 0.6 + 0.4 * Math.sin(performance.now() / 160) : 1
+      ctx.strokeRect(x + 1, top + 1, wNote - 2, height - 2)
+      ctx.globalAlpha = done ? 0.3 : 1
+    }
 
-    // So ngon tay
+    // So ngon tay — o vuong nho, dung phong chu cua ca trang
     if (settings.showFingers && n.f && height > 22 && wNote > 20) {
-      ctx.fillStyle = 'rgba(15,20,35,0.85)'
-      const r = Math.min(11, wNote / 2.6)
-      ctx.beginPath()
-      ctx.arc(x + wNote / 2, bottom - r - 4, r, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.fillStyle = '#fff'
-      ctx.font = `700 ${Math.round(r * 1.4)}px ui-sans-serif, system-ui, sans-serif`
+      const s = Math.min(20, wNote * 0.7)
+      ctx.fillStyle = 'rgba(19,18,17,0.9)'
+      ctx.fillRect(x + wNote / 2 - s / 2, bottom - s - 4, s, s)
+      ctx.fillStyle = '#efedec'
+      ctx.font = `700 ${Math.round(s * 0.62)}px ${FONT}`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText(String(n.f), x + wNote / 2, bottom - r - 3)
+      ctx.fillText(String(n.f), x + wNote / 2, bottom - s / 2 - 4)
     }
 
     // Ten not tren khoi not (khi du cho)
     if (settings.labels !== 'off' && height > 30 && wNote > 26) {
-      ctx.fillStyle = 'rgba(20,26,42,0.9)'
-      ctx.font = `700 ${Math.min(15, Math.round(wNote / 2.6))}px ui-sans-serif, system-ui, sans-serif`
+      ctx.fillStyle = n.h === 'R' ? 'rgba(255,255,255,0.92)' : 'rgba(19,18,17,0.86)'
+      ctx.font = `700 ${Math.min(15, Math.round(wNote / 2.6))}px ${FONT}`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'top'
       ctx.fillText(keyLabel(n.m, settings.labels), x + wNote / 2, top + 5)
@@ -367,11 +360,8 @@ function drawNotes(
 
 function drawNowLine(ctx: CanvasRenderingContext2D, w: number, kbTop: number, player: Player) {
   ctx.save()
-  const glow = player.waiting ? C_HINT : 'rgba(255,255,255,0.75)'
-  ctx.strokeStyle = glow
+  ctx.strokeStyle = player.waiting ? C_HINT : 'rgba(255,255,255,0.8)'
   ctx.lineWidth = player.waiting ? 3 : 2
-  ctx.shadowColor = glow
-  ctx.shadowBlur = player.waiting ? 16 : 8
   ctx.beginPath()
   ctx.moveTo(0, kbTop - 1)
   ctx.lineTo(w, kbTop - 1)
@@ -398,11 +388,17 @@ function drawKeyboard(
   ctx.translate(0, kbTop)
 
   // Nen ban phim
-  ctx.fillStyle = '#070b14'
-  ctx.fillRect(0, -6, layout.width, kbHeight + 6)
+  ctx.fillStyle = C_BLACK
+  ctx.fillRect(0, -4, layout.width, kbHeight + 4)
 
   const labelFontWhite = Math.max(11, Math.min(26, layout.whiteWidth * 0.46))
   const labelFontBlack = Math.max(9, Math.min(16, layout.blackWidth * 0.5))
+  // Chu so quang tam nam duoi ten not, nen ten not phai lui len dung bang chieu cao cua no
+  // — neu khong, phim to se bi cat mat chu so o mep duoi.
+  const octaveFont = Math.max(9, labelFontWhite * 0.55)
+  const showOctave = layout.whiteWidth > 26
+  const nameBaseline = kbHeight - (showOctave ? octaveFont + 14 : 16)
+  const octaveBaseline = kbHeight - 10
 
   for (const k of layout.keys) {
     if (k.black) continue
@@ -411,42 +407,34 @@ function drawKeyboard(
     const fl = player.flash.get(k.midi)
 
     let fill = C_WHITE
-    if (fl?.kind === 'wrong') fill = '#ffb4b4'
-    else if (fl?.kind === 'hit') fill = '#b6f5c8'
-    else if (pressed) fill = '#a7e2ff'
-    else if (hint) fill = '#d8ffe3'
+    if (fl?.kind === 'wrong') fill = '#e7b3a8'
+    else if (fl?.kind === 'hit') fill = '#ffffff'
+    else if (pressed) fill = C_PRESSED
+    else if (hint) fill = '#ffd2c7'
 
     ctx.fillStyle = fill
-    roundRect(ctx, k.x + 0.5, 0, k.w - 1, kbHeight - 2, 7)
-    ctx.fill()
+    ctx.fillRect(k.x + 0.5, 0, k.w - 1, kbHeight - 2)
     ctx.strokeStyle = C_WHITE_EDGE
     ctx.lineWidth = 1
-    ctx.stroke()
+    ctx.strokeRect(k.x + 0.5, 0, k.w - 1, kbHeight - 2)
 
-    if (hint) {
+    if (hint || fl?.kind === 'wrong') {
       ctx.strokeStyle = C_HINT
       ctx.lineWidth = 3
-      roundRect(ctx, k.x + 2, 1, k.w - 4, kbHeight - 5, 7)
-      ctx.stroke()
-    }
-    if (fl?.kind === 'wrong') {
-      ctx.strokeStyle = C_WRONG
-      ctx.lineWidth = 3
-      roundRect(ctx, k.x + 2, 1, k.w - 4, kbHeight - 5, 7)
-      ctx.stroke()
+      ctx.strokeRect(k.x + 2.5, 1.5, k.w - 5, kbHeight - 5)
     }
 
     const label = keyLabel(k.midi, settings.labels)
     if (label) {
-      ctx.fillStyle = hint ? '#12692f' : '#4a5568'
-      ctx.font = `${hint ? 800 : 600} ${labelFontWhite}px ui-sans-serif, system-ui, sans-serif`
+      ctx.fillStyle = hint ? '#a3200c' : 'rgba(19,18,17,0.62)'
+      ctx.font = `${hint ? 800 : 700} ${labelFontWhite}px ${FONT}`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'alphabetic'
-      ctx.fillText(label, k.x + k.w / 2, kbHeight - 16)
-      if (pitchClass(k.midi) === 0 && layout.whiteWidth > 26) {
-        ctx.fillStyle = 'rgba(74,85,104,0.65)'
-        ctx.font = `600 ${Math.max(9, labelFontWhite * 0.55)}px ui-sans-serif, system-ui, sans-serif`
-        ctx.fillText(String(octaveOf(k.midi)), k.x + k.w / 2, kbHeight - 16 + labelFontWhite * 0.85)
+      ctx.fillText(label, k.x + k.w / 2, nameBaseline)
+      if (pitchClass(k.midi) === 0 && showOctave) {
+        ctx.fillStyle = 'rgba(19,18,17,0.4)'
+        ctx.font = `700 ${octaveFont}px ${FONT}`
+        ctx.fillText(String(octaveOf(k.midi)), k.x + k.w / 2, octaveBaseline)
       }
     }
   }
@@ -458,22 +446,22 @@ function drawKeyboard(
     const fl = player.flash.get(k.midi)
 
     let fill = C_BLACK
-    if (fl?.kind === 'wrong') fill = '#8f2020'
-    else if (fl?.kind === 'hit') fill = '#166534'
-    else if (pressed) fill = '#0b6c92'
-    else if (hint) fill = '#14532d'
+    if (fl?.kind === 'wrong') fill = '#5e1508'
+    else if (fl?.kind === 'hit') fill = '#efedec'
+    else if (pressed) fill = C_PRESSED
+    else if (hint) fill = C_HINT
 
     ctx.fillStyle = fill
-    roundRect(ctx, k.x, -2, k.w, blackH, 5)
-    ctx.fill()
+    ctx.fillRect(k.x, -2, k.w, blackH)
     ctx.strokeStyle = hint ? C_HINT : C_BLACK_EDGE
-    ctx.lineWidth = hint ? 2.5 : 1
-    ctx.stroke()
+    ctx.lineWidth = hint ? 2 : 1
+    ctx.strokeRect(k.x + 0.5, -2, k.w - 1, blackH)
 
     const label = keyLabel(k.midi, settings.labels)
     if (label && layout.blackWidth > 18) {
-      ctx.fillStyle = hint ? '#bbf7d0' : 'rgba(226,232,240,0.75)'
-      ctx.font = `700 ${labelFontBlack}px ui-sans-serif, system-ui, sans-serif`
+      const onLight = hint || fl?.kind === 'hit' || pressed
+      ctx.fillStyle = onLight ? 'rgba(19,18,17,0.85)' : 'rgba(239,237,236,0.7)'
+      ctx.font = `700 ${labelFontBlack}px ${FONT}`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'alphabetic'
       ctx.fillText(label, k.x + k.w / 2, blackH - 10)
@@ -485,22 +473,20 @@ function drawKeyboard(
 }
 
 function drawOverlay(ctx: CanvasRenderingContext2D, w: number, kbTop: number, player: Player) {
-  if (!player.playing && !player.finished) return
-  if (player.finished) {
-    ctx.save()
-    ctx.fillStyle = 'rgba(8,12,22,0.55)'
-    ctx.fillRect(0, 0, w, kbTop)
-    ctx.fillStyle = '#fde68a'
-    ctx.font = '800 34px ui-sans-serif, system-ui, sans-serif'
-    ctx.textAlign = 'center'
-    ctx.fillText('Hết bài rồi — giỏi quá!', w / 2, kbTop / 2)
-    const acc = player.accuracy()
-    if (acc != null) {
-      ctx.fillStyle = '#e2e8f0'
-      ctx.font = '600 20px ui-sans-serif, system-ui, sans-serif'
-      ctx.fillText(`Đúng ${Math.round(acc * 100)}%`, w / 2, kbTop / 2 + 40)
-    }
-    ctx.restore()
-    ctx.textAlign = 'left'
+  if (!player.finished) return
+  ctx.save()
+  ctx.fillStyle = 'rgba(19,18,17,0.86)'
+  ctx.fillRect(0, 0, w, kbTop)
+  ctx.fillStyle = C_HINT
+  ctx.font = `800 ${Math.min(38, Math.max(22, w / 26))}px ${FONT}`
+  ctx.textAlign = 'center'
+  ctx.fillText('HẾT BÀI RỒI — GIỎI QUÁ!', w / 2, kbTop / 2)
+  const acc = player.accuracy()
+  if (acc != null) {
+    ctx.fillStyle = '#efedec'
+    ctx.font = `600 18px ${FONT}`
+    ctx.fillText(`Đúng ${Math.round(acc * 100)}%`, w / 2, kbTop / 2 + 34)
   }
+  ctx.restore()
+  ctx.textAlign = 'left'
 }

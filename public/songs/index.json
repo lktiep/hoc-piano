@@ -4,6 +4,8 @@
     "title": "Ngôi sao lấp lánh",
     "artist": "Dân ca Pháp",
     "level": 1,
+    "genre": "DÂN CA",
+    "seconds": 30,
     "file": "ngoi-sao-lap-lanh.json"
   },
   {
@@ -11,6 +13,8 @@
     "title": "Mary có con cừu nhỏ",
     "artist": "Đồng dao Anh",
     "level": 1,
+    "genre": "ĐỒNG DAO",
+    "seconds": 20,
     "file": "mary-co-con-cuu-nho.json"
   },
   {
@@ -18,6 +22,8 @@
     "title": "Kìa con bướm vàng",
     "artist": "Dân ca (Frère Jacques)",
     "level": 1,
+    "genre": "ĐỒNG DAO",
+    "seconds": 18,
     "file": "kia-con-buom-vang.json"
   },
   {
@@ -25,6 +31,8 @@
     "title": "Khúc hoan ca (Ode to Joy)",
     "artist": "L. van Beethoven",
     "level": 2,
+    "genre": "CỔ ĐIỂN",
+    "seconds": 19,
     "file": "khuc-hoan-ca.json"
   },
   {
@@ -32,6 +40,8 @@
     "title": "Jingle Bells (điệp khúc)",
     "artist": "J. Pierpont",
     "level": 2,
+    "genre": "LỄ HỘI",
+    "seconds": 16,
     "file": "jingle-bells.json"
   },
   {
@@ -39,6 +49,8 @@
     "title": "Chúc mừng sinh nhật",
     "artist": "Dân ca",
     "level": 2,
+    "genre": "LỄ HỘI",
+    "seconds": 15,
     "file": "chuc-mung-sinh-nhat.json"
   },
   {
@@ -46,6 +58,8 @@
     "title": "Für Elise (đoạn mở đầu)",
     "artist": "L. van Beethoven",
     "level": 4,
+    "genre": "CỔ ĐIỂN",
+    "seconds": 12,
     "file": "fur-elise.json"
   },
   {
@@ -53,6 +67,8 @@
     "title": "Gam Đô trưởng (luyện ngón)",
     "artist": "Bài luyện tập",
     "level": 1,
+    "genre": "LUYỆN NGÓN",
+    "seconds": 12,
     "file": "thang-am-do-truong.json"
   }
 ]

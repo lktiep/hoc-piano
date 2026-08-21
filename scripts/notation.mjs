@@ -117,6 +117,7 @@ export function makeSong(spec) {
     measures,
     notes,
     level: spec.level,
+    genre: spec.genre,
     tags: spec.tags,
     note: spec.note,
   }

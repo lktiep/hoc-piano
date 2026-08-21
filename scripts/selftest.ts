@@ -96,6 +96,8 @@ function makePlayer(song: Song, patch: Partial<Settings> = {}) {
     showFingers: true,
     lookaheadBeats: 8,
     loop: null,
+    transpose: 0,
+    view: 'fall',
     ...patch,
   }
   const p = new Player(synth as unknown as PianoSynth, metro as unknown as Metronome, settings)

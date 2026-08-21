@@ -24,30 +24,40 @@ Các lệnh khác:
 | `npm run dev` | chạy thử ở máy |
 | `npm run build` | dựng bản chạy thật vào `dist/` |
 | `npm run preview` | xem thử bản đã dựng |
-| `npm test` | chạy toàn bộ 180 bài kiểm thử |
+| `npm test` | chạy toàn bộ 207 bài kiểm thử |
 | `npm run typecheck` | kiểm tra kiểu TypeScript |
 | `npm run songs` | sinh lại các bài có sẵn trong `public/songs/` |
 | `npm run import -- <tệp>` | nạp một bản nhạc mới vào kho bài |
 
 ---
 
-## Hai trang
+## Bốn trang
 
 | Địa chỉ | Trang |
 | --- | --- |
-| `#/` | **Trang chủ** — giới thiệu, lộ trình ba mức, các lối vào nhanh |
-| `#/luyen-tap` | **Phòng luyện** — nốt rơi, bàn phím to, thanh điều khiển |
+| `#/` | **Trang chủ** — giới thiệu, ba mức lộ trình, các lối vào nhanh |
+| `#/thu-vien` | **Thư viện** — cả kho bài dạng bảng, có ô tìm và lọc theo mức |
+| `#/lo-trinh` | **Lộ trình** — ba chặng, bài nào đã chơi xong thì tô màu |
+| `#/luyen-tap` | **Phòng luyện** — nốt rơi (hoặc khuông nhạc), bàn phím to, thanh điều khiển |
 
 Định tuyến bằng dấu `#` nên chạy được trên mọi máy chủ tĩnh (kể cả mở thẳng
-`dist/index.html` bằng trình duyệt), không cần cấu hình rewrite. Bấm dấu hiệu
-**PHÍM.** ở góc trái thanh trên là về lại trang chủ; rời phòng luyện thì nhạc
-tự dừng và nhả hết phím.
+`dist/index.html` bằng trình duyệt), không cần cấu hình rewrite. Thanh điều
+hướng ở đầu cả bốn trang là như nhau; rời phòng luyện thì nhạc tự dừng và nhả
+hết phím.
 
-Trang chủ dựng theo bản thiết kế `Trang Chu.dc.html` (hệ **Modernist**: nền
-`#131211`, chữ Archivo đậm, góc vuông tuyệt đối, một màu nhấn `#ec3013`). Mọi
-con số trên trang đều lấy từ dữ liệu thật — số bài đếm từ `public/songs/index.json`
-cộng các bài bé tự thêm, ba mức lộ trình đếm theo `level` của từng bài — nên
-thêm bài là trang chủ tự đổi theo, không có con số nào viết cứng.
+Cả bốn trang dựng theo bộ thiết kế `Trang Chu.dc.html`, `Thu Vien.dc.html`,
+`Lo Trinh.dc.html`, `Piano Player.dc.html` (hệ **Modernist**: nền `#131211`,
+chữ Archivo đậm, góc vuông tuyệt đối, một màu nhấn `#ec3013`). Mọi con số trên
+trang đều lấy từ dữ liệu thật — số bài và độ dài đếm từ `public/songs/index.json`
+cộng các bài bé tự thêm, ba mức lộ trình đếm theo `level` của từng bài, phần
+trăm hoàn thành đếm theo những bài bé **thực sự chơi hết** — nên thêm bài là
+trang tự đổi theo, không có con số nào viết cứng. Bản thiết kế có vài thẻ bài
+"khoá" và một mục mời mua bản Pro; những phần đó bị bỏ đi vì trang này không
+khoá bài nào và không bán gì.
+
+Tiến độ lưu ngay trong trình duyệt (`src/progress.ts`), chỉ ghi khi `Player`
+báo `onFinish` — tức là bé chơi hết bài thật. Muốn xoá thì bấm **ĐẶT LẠI TIẾN ĐỘ**
+ở cuối trang Lộ trình.
 
 Phông **Archivo** để sẵn trong `src/fonts/` (ba tệp `.woff2` cắt theo bảng chữ:
 Việt / Latin mở rộng / Latin, giấy phép SIL OFL 1.1) chứ không gọi ra Google
@@ -82,15 +92,31 @@ Chọn **Tay phải / Tay trái / Hai tay** — tay còn lại máy sẽ tự đ
 - `Space` — chơi / dừng
 - `Esc` — đóng hộp thoại
 
+### Hai cách nhìn cùng một bài
+
+- **Nốt rơi** *(mặc định)* — nốt rơi thẳng xuống đúng cột phím, dễ cho bé mới học.
+- **Bản nhạc** — khuông nhạc như trong sách, có vạch đàn chạy theo và tự cuộn;
+  bàn phím vẫn nằm dưới nhưng thu gọn lại.
+
+Đổi qua lại bằng nút **BẢN NHẠC / NỐT RƠI** trên thanh điều khiển — bài đang chạy
+không bị dừng lại.
+
+### Dịch giọng
+
+Nút **DỊCH GIỌNG** nâng hoặc hạ cả bài theo từng nửa cung (±12), khi bài quá cao
+hoặc quá thấp so với tầm tay bé. Bài được dịch **trước khi** nạp vào bộ chơi nên
+nốt rơi, khuông nhạc, phím sáng, tiếng đàn và cả phím máy tính đều đổi theo một
+lượt; đang chơi tới đâu thì giữ nguyên chỗ đó.
+
 ### Màu sắc
 
-- 🟠 cam = **tay phải**, 🔵 xanh dương = **tay trái**
-- 🟢 viền xanh lá = nốt **đang chờ bé bấm**
-- 🔴 đỏ = bấm nhầm phím
+- 🔴 cam đỏ `#ec3013` = **tay phải**, ⚪ trắng = **tay trái**
+- phím **đang chờ bé bấm** sáng cam đỏ và có viền đậm
+- bấm nhầm thì phím tối lại một nhịp
 
 ### Trong ⚙ Cài đặt
 
-Tốc độ chậm lại (25%–150%), tên nốt (Đô Rê Mi / C D E / ẩn), số ngón tay,
+Nhịp chậm lại (25%–150%), tên nốt (Đô Rê Mi / C D E / ẩn), số ngón tay,
 gõ nhịp, đếm vào, độ "nhìn trước", **lặp một đoạn** (chọn từ ô nhịp mấy đến ô nhịp mấy)
 để tập đi tập lại chỗ khó, và bàn phím rộng 5 quãng tám.
 
@@ -176,10 +202,11 @@ npm test
 - `scripts/selftest.ts` — 117 phép thử phần lõi: hình học phím đàn, đổi phách↔giây,
   cả ba chế độ chơi, lặp đoạn, gõ nhịp, đổi tốc độ, đọc MusicXML (kể cả dấu nhắc lại
   và dấu nối), đọc tệp MIDI, và kiểm tra mọi bài trong `public/songs/`.
-- `scripts/uitest.ts` — 63 phép thử **cả giao diện thật** trong DOM giả (jsdom):
-  mount app, kiểm tra trang chủ (số liệu phải khớp kho bài thật), đi qua lại giữa
-  trang chủ và phòng luyện, vẽ canvas, bấm nút, gõ phím, bấm chuột lên phím đàn,
-  mở/đóng hộp thoại, chạy 600 khung hình liên tục và bắt mọi lỗi lúc chạy.
+- `scripts/uitest.ts` — 90 phép thử **cả giao diện thật** trong DOM giả (jsdom):
+  mount app, kiểm tra cả bốn trang (số liệu phải khớp kho bài thật), tìm và lọc
+  ở Thư viện, đếm bài từng chặng ở Lộ trình, đi qua lại giữa các trang, đổi
+  khuông nhạc ↔ nốt rơi, dịch giọng, vẽ canvas, bấm nút, gõ phím, bấm chuột lên
+  phím đàn, mở/đóng hộp thoại, chạy 600 khung hình liên tục và bắt mọi lỗi lúc chạy.
 
 Cả hai chạy tự động trên GitHub Actions ở mỗi lần push.
 
@@ -215,9 +242,15 @@ kể cả mở thẳng `dist/index.html` bằng trình duyệt, hoặc đặt l�
 ```
 src/
   App.tsx              gắn mọi thứ lại với nhau, định tuyến #/, phím tắt, lưu cài đặt
+  routes.ts            bốn trang và địa chỉ `#` của chúng
   types.ts             mô hình dữ liệu bài hát (thời gian tính bằng PHÁCH, không phải giây)
+  catalog.ts           gộp kho bài có sẵn với bài tự thêm thành một danh sách chung
+  progress.ts          tiến độ thật của bé, lưu trong trình duyệt
+  site.css             nền chung của các trang giới thiệu (thanh điều hướng, chân trang)
   styles.css           giao diện phòng luyện
-  home.css             giao diện trang chủ (mọi lớp mang tiền tố `hm-`)
+  home.css             trang chủ (lớp `hm-`)
+  library.css          thư viện (lớp `lb-`)
+  roadmap.css          lộ trình (lớp `rm-`)
   fonts/               phông Archivo cắt sẵn, dùng ngoại tuyến
   engine/
     timeline.ts        đổi phách ↔ giây, có bản đồ tempo và vạch nhịp
@@ -235,8 +268,12 @@ src/
     webmidi.ts         đàn piano điện qua Web MIDI
     keymap.ts          bàn phím máy tính
   components/
+    SiteNav.tsx        thanh điều hướng + chân trang dùng chung cho cả bốn trang
     Home.tsx           trang chủ — số liệu và lộ trình lấy từ kho bài thật
+    Library.tsx        thư viện — bảng cả kho bài, có tìm và lọc theo mức
+    Roadmap.tsx        lộ trình ba chặng, tô màu theo bài đã chơi xong
     Stage.tsx          MỘT canvas vẽ cả nốt rơi lẫn bàn phím (khớp cột tuyệt đối, 60fps)
+    Sheet.tsx          khuông nhạc (SVG) cho cách nhìn "Bản nhạc"
     Controls.tsx       thanh điều khiển + bảng cài đặt
     SongPicker.tsx     chọn bài
     ImportDialog.tsx   thêm bài từ MuseScore

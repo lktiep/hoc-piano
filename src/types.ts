@@ -44,6 +44,8 @@ export interface Song {
   notes: SongNote[]
   /** 1 = de nhat */
   level?: number
+  /** the loai de loc trong thu vien, vi du "DÂN CA", "CỔ ĐIỂN" */
+  genre?: string
   tags?: string[]
   /** ghi chu hien thi cho be / phu huynh */
   note?: string
@@ -55,6 +57,9 @@ export interface SongIndexEntry {
   title: string
   artist?: string
   level?: number
+  genre?: string
+  /** do dai bai tinh bang giay - de thu vien hien duoc "DÀI" ma khong phai tai ca bai */
+  seconds?: number
   file: string
 }
 
@@ -68,6 +73,8 @@ export type PlayMode =
 
 export type HandChoice = 'both' | 'right' | 'left'
 export type LabelStyle = 'off' | 'letters' | 'solfege'
+/** Hai cach nhin bai: khuong nhac, hoac not roi xuong phim. */
+export type StageView = 'sheet' | 'fall'
 
 export interface Settings {
   mode: PlayMode
@@ -85,4 +92,8 @@ export interface Settings {
   lookaheadBeats: number
   /** lap doan: [o nhip bat dau, o nhip ket thuc], 1-based, null = tat */
   loop: [number, number] | null
+  /** dich giong, tinh bang nua cung (-12..12). 0 = dung cao do goc */
+  transpose: number
+  /** dang xem: khuong nhac hay not roi */
+  view: StageView
 }

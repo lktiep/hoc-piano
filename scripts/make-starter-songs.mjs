@@ -24,6 +24,7 @@ const SPECS = [
     title: 'Ngôi sao lấp lánh',
     artist: 'Dân ca Pháp',
     level: 1,
+    genre: 'DÂN CA',
     bpm: 96,
     timeSignature: [4, 4],
     note: 'Bài đầu tiên rất hợp để làm quen: tay phải chỉ đi trong 6 nốt liền nhau.',
@@ -39,6 +40,7 @@ const SPECS = [
     title: 'Mary có con cừu nhỏ',
     artist: 'Đồng dao Anh',
     level: 1,
+    genre: 'ĐỒNG DAO',
     bpm: 96,
     timeSignature: [4, 4],
     note: 'Tay phải đặt cố định 5 ngón Đô–Sol, không cần chuyển tay.',
@@ -52,6 +54,7 @@ const SPECS = [
     title: 'Kìa con bướm vàng',
     artist: 'Dân ca (Frère Jacques)',
     level: 1,
+    genre: 'ĐỒNG DAO',
     bpm: 104,
     timeSignature: [4, 4],
     note: 'Mỗi câu hát lặp lại hai lần — bé dễ nhớ.',
@@ -65,6 +68,7 @@ const SPECS = [
     title: 'Khúc hoan ca (Ode to Joy)',
     artist: 'L. van Beethoven',
     level: 2,
+    genre: 'CỔ ĐIỂN',
     bpm: 100,
     timeSignature: [4, 4],
     note: 'Chú ý ô nhịp 4 và 8: nốt đen chấm dôi rồi nốt móc đơn.',
@@ -79,6 +83,7 @@ const SPECS = [
     title: 'Jingle Bells (điệp khúc)',
     artist: 'J. Pierpont',
     level: 2,
+    genre: 'LỄ HỘI',
     bpm: 120,
     timeSignature: [4, 4],
     rh: `E4 E4 E4:2  E4 E4 E4:2  E4 G4 C4 D4  E4:4
@@ -90,6 +95,7 @@ const SPECS = [
     title: 'Chúc mừng sinh nhật',
     artist: 'Dân ca',
     level: 2,
+    genre: 'LỄ HỘI',
     bpm: 100,
     timeSignature: [3, 4],
     pickup: 1,
@@ -107,6 +113,7 @@ const SPECS = [
     title: 'Für Elise (đoạn mở đầu)',
     artist: 'L. van Beethoven',
     level: 4,
+    genre: 'CỔ ĐIỂN',
     bpm: 60,
     timeSignature: [3, 8],
     pickup: 0.5,
@@ -135,6 +142,7 @@ const SPECS = [
     title: 'Gam Đô trưởng (luyện ngón)',
     artist: 'Bài luyện tập',
     level: 1,
+    genre: 'LUYỆN NGÓN',
     bpm: 80,
     timeSignature: [4, 4],
     note: 'Đi lên rồi đi xuống. Tay phải 1-2-3-1-2-3-4-5, tay trái 5-4-3-2-1-3-2-1.',
@@ -155,8 +163,10 @@ for (const spec of SPECS) {
   const song = makeSong(spec)
   const file = `${song.id}.json`
   writeFileSync(join(OUT, file), JSON.stringify(song, null, 1) + '\n', 'utf8')
-  index.push({ id: song.id, title: song.title, artist: song.artist, level: song.level, file })
+  // Do dai bai: cac bai o day khong doi tempo giua chung nen phach/bpm la chinh xac.
   const beats = song.notes.reduce((mx, n) => Math.max(mx, n.t + n.d), 0)
+  const seconds = Math.round((beats / song.bpm) * 60)
+  index.push({ id: song.id, title: song.title, artist: song.artist, level: song.level, genre: song.genre, seconds, file })
   console.log(`✓ ${file.padEnd(30)} ${String(song.notes.length).padStart(4)} nốt  ${beats} phách  ${song.measures.length - 1} ô nhịp`)
 }
 

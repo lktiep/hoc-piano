@@ -3,14 +3,14 @@
  *
  * Moi con so va moi duong dan tren trang deu noi voi du lieu that cua ung dung:
  * so bai lay tu kho bai, cac muc lo trinh dem theo do kho, cac nut mo dung
- * phong luyen / thu vien / hop thoai them bai.
+ * phong luyen / thu vien / lo trinh / hop thoai them bai.
  */
 
-import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react'
+import type { CSSProperties } from 'react'
+import { SiteFoot, SiteNav } from './SiteNav'
+import { levelGroup, type LevelGroup } from '../catalog'
+import type { Route } from '../routes'
 import type { Song, SongIndexEntry } from '../types'
-
-/** Ten hien tren trang. Doi o day la doi ca trang. */
-const BRAND = 'PHÍM'
 
 const KEY_NAMES = ['Đô', 'Rê', 'Mi', 'Fa', 'Sol', 'La', 'Si', 'Đô']
 /** Vi tri phim den trong mot quang tam (theo % be ngang), giong ban thiet ke. */
@@ -18,10 +18,10 @@ const BLACK_KEYS = [9, 21.5, 46.5, 59, 71.5]
 /** Do dai tung not trong hinh minh hoa — dai ngan khac nhau cho ra dang mot cau nhac. */
 const NOTE_HEIGHTS = [40, 40, 62, 40, 40, 78, 40, 96]
 
-const LEVELS: { num: string; name: string; meta: string; has: (level: number) => boolean }[] = [
-  { num: '01', name: 'Cơ bản', meta: 'Một tay, năm ngón', has: (l) => l <= 1 },
-  { num: '02', name: 'Trung cấp', meta: 'Hai tay, nốt móc đơn', has: (l) => l === 2 || l === 3 },
-  { num: '03', name: 'Nâng cao', meta: 'Chuyển ngón & sắc thái', has: (l) => l >= 4 },
+const LEVELS: { num: string; name: string; meta: string; key: LevelGroup }[] = [
+  { num: '01', name: 'Cơ bản', meta: 'Một tay, năm ngón', key: 1 },
+  { num: '02', name: 'Trung cấp', meta: 'Hai tay, nốt móc đơn', key: 2 },
+  { num: '03', name: 'Nâng cao', meta: 'Chuyển ngón & sắc thái', key: 3 },
 ]
 
 /** `--i` cho phep CSS tinh do tre cua tung phim / tung not roi. */
@@ -47,59 +47,24 @@ function Keyboard({ className = '' }: { className?: string }) {
 interface HomeProps {
   index: SongIndexEntry[]
   localSongs: Song[]
-  onEnterPlayer: () => void
-  onOpenLibrary: () => void
+  go: (route: Route) => void
   onOpenImport: () => void
   onOpenSong: (id: string) => void
 }
 
-export function Home({ index, localSongs, onEnterPlayer, onOpenLibrary, onOpenImport, onOpenSong }: HomeProps) {
-  const songCount = index.length + localSongs.length
-  const levels = [...index, ...localSongs].map((s) => s.level ?? 1)
-
-  const goPath = (e: ReactMouseEvent) => {
-    e.preventDefault()
-    document.getElementById('lo-trinh')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+export function Home({ index, localSongs, go, onOpenImport, onOpenSong }: HomeProps) {
+  const ids = new Set<string>()
+  const levels: number[] = []
+  for (const s of [...index, ...localSongs]) {
+    if (ids.has(s.id)) continue
+    ids.add(s.id)
+    levels.push(s.level ?? 1)
   }
-  const act = (fn: () => void) => (e: ReactMouseEvent) => {
-    e.preventDefault()
-    fn()
-  }
+  const songCount = levels.length
 
   return (
-    <div className="home">
-      {/* ------------------------------------------------------------ dieu huong */}
-      <header className="hm-nav">
-        <a className="hm-brand" href="#/" onClick={(e) => e.preventDefault()}>
-          <span className="hm-brand-mark" />
-          <span>
-            {BRAND}
-            <span className="hm-dot">.</span>
-          </span>
-        </a>
-        <nav className="hm-nav-links">
-          <a className="is-current" href="#/" onClick={(e) => e.preventDefault()}>
-            TRANG CHỦ
-          </a>
-          <a href="#/luyen-tap" onClick={act(onEnterPlayer)}>
-            LUYỆN TẬP
-          </a>
-          <a href="#/luyen-tap" onClick={act(onOpenLibrary)}>
-            THƯ VIỆN
-          </a>
-          <a href="#lo-trinh" onClick={goPath}>
-            LỘ TRÌNH
-          </a>
-        </nav>
-        <div className="hm-nav-right">
-          <button className="hm-link-btn" onClick={onOpenImport}>
-            ＋ THÊM BÀI
-          </button>
-          <button className="hm-btn" onClick={onEnterPlayer}>
-            VÀO PHÒNG LUYỆN
-          </button>
-        </div>
-      </header>
+    <div className="site home">
+      <SiteNav current="home" go={go} onOpenImport={onOpenImport} />
 
       {/* ----------------------------------------------------------------- hero */}
       <section className="hm-hero">
@@ -111,14 +76,14 @@ export function Home({ index, localSongs, onEnterPlayer, onOpenLibrary, onOpenIm
             bấm đúng rồi mới chạy tiếp — nên bé tập một mình cũng không bị bỏ lại.
           </p>
           <div className="hm-hero-actions">
-            <button className="hm-btn-lg" onClick={onEnterPlayer}>
+            <button className="hm-btn-lg" onClick={() => go('player')}>
               VÀO PHÒNG LUYỆN
               <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 12h14" />
                 <path d="M13 5l7 7-7 7" />
               </svg>
             </button>
-            <button className="hm-btn-ghost" onClick={onOpenLibrary}>
+            <button className="hm-btn-ghost" onClick={() => go('library')}>
               XEM THƯ VIỆN
             </button>
           </div>
@@ -183,7 +148,7 @@ export function Home({ index, localSongs, onEnterPlayer, onOpenLibrary, onOpenIm
               Dân ca, đồng dao và nhạc cổ điển xếp sẵn theo độ khó. Muốn bài nào khác thì tải bản nhạc từ MuseScore rồi
               thả thẳng vào trang.
             </p>
-            <button className="hm-more" onClick={onOpenLibrary}>
+            <button className="hm-more" onClick={() => go('library')}>
               MỞ THƯ VIỆN →
             </button>
           </div>
@@ -194,7 +159,7 @@ export function Home({ index, localSongs, onEnterPlayer, onOpenLibrary, onOpenIm
               Nốt rơi đúng cột phím, phím cần bấm sáng lên và bài nhạc đứng chờ. Đàn piano điện, chuột hay bàn phím máy
               tính đều chơi được.
             </p>
-            <button className="hm-more" onClick={onEnterPlayer}>
+            <button className="hm-more" onClick={() => go('player')}>
               VÀO PHÒNG LUYỆN →
             </button>
           </div>
@@ -204,7 +169,7 @@ export function Home({ index, localSongs, onEnterPlayer, onOpenLibrary, onOpenIm
             <p>
               Bắt đầu ở một nửa tốc độ, lặp riêng đoạn khó cho tới khi thuộc tay, rồi nhanh dần lên đúng nhịp của bài.
             </p>
-            <button className="hm-more" onClick={goPath}>
+            <button className="hm-more" onClick={() => go('roadmap')}>
               XEM LỘ TRÌNH →
             </button>
           </div>
@@ -238,9 +203,9 @@ export function Home({ index, localSongs, onEnterPlayer, onOpenLibrary, onOpenIm
           </p>
           <div className="hm-levels">
             {LEVELS.map((lv) => {
-              const n = levels.filter(lv.has).length
+              const n = levels.filter((l) => levelGroup(l) === lv.key).length
               return (
-                <button key={lv.num} className="hm-level" onClick={onOpenLibrary}>
+                <button key={lv.num} className="hm-level" onClick={() => go('roadmap')}>
                   <span className="hm-level-num">{lv.num}</span>
                   <span className="hm-level-name">{lv.name}</span>
                   <span className="hm-level-meta">
@@ -259,7 +224,7 @@ export function Home({ index, localSongs, onEnterPlayer, onOpenLibrary, onOpenIm
           <h2>Ngồi vào đàn hôm nay.</h2>
           <p>Không cần đăng nhập, không cần cài gì. Mở trang lên là bấm được — kể cả khi mất mạng.</p>
           <div className="hm-cta-actions">
-            <button className="hm-btn-white" onClick={onEnterPlayer}>
+            <button className="hm-btn-white" onClick={() => go('player')}>
               BẮT ĐẦU TẬP NGAY
             </button>
             <button className="hm-btn-outline" onClick={onOpenImport}>
@@ -269,26 +234,7 @@ export function Home({ index, localSongs, onEnterPlayer, onOpenLibrary, onOpenIm
         </div>
       </section>
 
-      {/* ------------------------------------------------------------ chan trang */}
-      <footer className="hm-foot">
-        <span className="hm-foot-brand">
-          <span className="hm-brand-mark" />
-          <span>
-            {BRAND}
-            <span className="hm-dot">.</span>
-          </span>
-        </span>
-        <button className="hm-link-btn" onClick={onOpenLibrary}>
-          THƯ VIỆN
-        </button>
-        <a href="#lo-trinh" onClick={goPath}>
-          LỘ TRÌNH
-        </a>
-        <a href="#/luyen-tap" onClick={act(onEnterPlayer)}>
-          LUYỆN TẬP
-        </a>
-        <span className="hm-foot-note">© 2026 {BRAND} — Học piano tương tác</span>
-      </footer>
+      <SiteFoot go={go} />
     </div>
   )
 }

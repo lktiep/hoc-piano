@@ -1,0 +1,341 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Thu vien — theo ban thiet ke "Thu Vien.dc.html".
+
+   Mot bang phang, khong the, khong bo goc: cot chia bang duong ke 1px va
+   khoang trong. Loc bang o tim, bo nut trinh do va cac chip the loai.
+   Tien to `lb-` (library).
+   ══════════════════════════════════════════════════════════════════════ */
+
+.library {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ------------------------------------------------------------------ hang loc */
+
+.lb-filters {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  width: 100%;
+  padding: 16px var(--pad-x);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.5vw, 32px);
+  flex-wrap: wrap;
+}
+
+.lb-search {
+  width: 320px;
+  max-width: 100%;
+  background: var(--n-100);
+  border: 1px solid var(--line);
+  color: var(--color-text);
+  font-family: var(--font-b);
+  font-size: 13px;
+  padding: 10px 14px;
+}
+.lb-search::placeholder {
+  color: var(--n-500);
+}
+.lb-search:focus {
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+/* Bo nut trinh do: cac o dinh lien nhau, chi mot duong ke ngan cach */
+.lb-seg {
+  display: flex;
+  border: 1px solid var(--line);
+}
+.lb-seg button {
+  background: none;
+  border: none;
+  border-left: 1px solid var(--line);
+  color: var(--n-600);
+  font-family: var(--font-b);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 9px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lb-seg button:first-child {
+  border-left: none;
+}
+.lb-seg button:hover {
+  color: var(--color-text);
+}
+.lb-seg button.is-on {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.lb-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.lb-chip {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--n-600);
+  font-family: var(--font-b);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 8px 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lb-chip:hover {
+  color: var(--color-text);
+  border-color: var(--n-400);
+}
+.lb-chip.is-on {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.lb-filters-note {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--n-500);
+}
+
+/* ------------------------------------------------------------------ bang */
+
+.lb-table {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--pad-x) 56px;
+  flex: 1;
+}
+
+.lb-head,
+.lb-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 240px 130px 150px 90px 150px;
+  align-items: center;
+  gap: 12px;
+}
+
+.lb-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--n-500);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.lb-row {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--n-200);
+  cursor: pointer;
+  animation: hm-rise 0.5s ease both;
+}
+.lb-row:hover {
+  background: var(--n-200);
+}
+.lb-row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.lb-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--n-400);
+  font-variant-numeric: tabular-nums;
+}
+.lb-row:hover .lb-num {
+  color: var(--color-accent);
+}
+
+.lb-title {
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lb-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Dau tick: bai be da choi tron ven it nhat mot lan */
+.lb-done {
+  color: var(--color-accent);
+  font-size: 13px;
+  flex: none;
+}
+.lb-mine {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--n-500);
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  flex: none;
+}
+
+.lb-artist,
+.lb-genre,
+.lb-len {
+  font-size: 13px;
+  color: var(--n-600);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-genre {
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.lb-len {
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 9px;
+  justify-self: start;
+  white-space: nowrap;
+}
+.lb-tag.lv1 {
+  border: 1px solid var(--n-300);
+  color: var(--n-700);
+}
+.lb-tag.lv2 {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
+.lb-tag.lv3 {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.lb-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+}
+.lb-go {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-b);
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: 0;
+}
+.lb-row:hover .lb-go,
+.lb-row:focus-within .lb-go {
+  opacity: 1;
+}
+.lb-del {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--n-500);
+  font-family: var(--font-b);
+  font-size: 12px;
+  line-height: 1;
+  padding: 5px 8px;
+  cursor: pointer;
+  flex: none;
+}
+.lb-del:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ------------------------------------------------------------------ trong */
+
+.lb-empty {
+  padding: 72px 0;
+  text-align: center;
+}
+.lb-empty h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.lb-empty p {
+  color: var(--n-600);
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+
+/* ------------------------------------------------------------------ man hinh nho */
+
+@media (max-width: 1180px) {
+  .lb-head,
+  .lb-row {
+    grid-template-columns: 44px 1fr 180px 120px 130px 76px 120px;
+  }
+}
+
+@media (max-width: 940px) {
+  .lb-head,
+  .lb-row {
+    grid-template-columns: 40px 1fr 130px 76px 110px;
+  }
+  /* Bo cot tac gia va the loai — ten bai da co san dong phu ben duoi */
+  .lb-head span:nth-child(3),
+  .lb-head span:nth-child(4),
+  .lb-artist,
+  .lb-genre {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .lb-head {
+    display: none;
+  }
+  .lb-row {
+    grid-template-columns: 32px 1fr auto;
+    row-gap: 4px;
+    align-items: start;
+  }
+  .lb-title {
+    font-size: 15px;
+  }
+  .lb-tag {
+    grid-column: 2;
+  }
+  .lb-len {
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
+  }
+  .lb-actions {
+    grid-column: 3;
+    grid-row: 2;
+  }
+  .lb-go {
+    opacity: 1;
+  }
+  .lb-filters {
+    gap: 12px;
+  }
+  .lb-filters-note {
+    margin-left: 0;
+  }
+}

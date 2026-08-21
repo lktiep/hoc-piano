@@ -266,7 +266,7 @@ async function key(type: 'keydown' | 'keyup', code: string) {
     window.dispatchEvent(new window.KeyboardEvent(type, { code, key: code, bubbles: true, cancelable: true }))
   })
 }
-async function setRange(el: HTMLElement | null, value: number) {
+async function setRange(el: HTMLElement | null, value: number | string) {
   if (!el) throw new Error('khong thay thanh truot')
   const desc = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')
   desc!.set!.call(el, String(value))
@@ -317,6 +317,49 @@ eq($$('.hm-key-w')[0].textContent, 'Đô', 'phim minh hoa co ten not tieng Viet'
 ok($('.hm-cta-band') != null, 'co dai keu goi cuoi trang')
 ok($('.hm-foot-note')!.textContent!.includes('2026'), 'co chan trang')
 
+suite('Thu vien')
+await click(await byText('.hm-nav-links a', 'THƯ VIỆN'), 'lien ket Thu vien')
+await frame(2)
+ok($('.library') != null, 'mo duoc trang thu vien')
+eq(window.location.hash, '#/thu-vien', 'dia chi doi theo trang')
+eq($$('.lb-row').length, 8, 'bang liet ke du 8 ban nhac')
+ok(textOf('.lb-row .lb-title')!.includes('Ngôi sao'), 'hang dau la bai dau tien cua kho')
+ok($$('.lb-len')[0].textContent!.includes(':'), 'co cot do dai that', $$('.lb-len')[0].textContent ?? '')
+ok($$('.lb-chip').length > 1, `bo loc the loai sinh tu du lieu (${$$('.lb-chip').length} the loai)`)
+await setRange($('.lb-search'), 'ngoi sao')
+await frame(2)
+eq($$('.lb-row').length, 1, 'go khong dau van tim ra bai')
+await setRange($('.lb-search'), 'zzz')
+await frame(2)
+ok($('.lb-empty') != null, 'khong co ket qua thi bao ro')
+await click(await byText('.lb-empty button', 'BỎ BỘ LỌC'), 'bo bo loc')
+await frame(2)
+eq($$('.lb-row').length, 8, 'bo loc xong hien lai du bai')
+await click(await byText('.lb-seg button', 'CƠ BẢN'), 'loc muc co ban')
+await frame(2)
+eq($$('.lb-row').length, 4, 'muc co ban co 4 bai')
+await click(await byText('.lb-seg button', 'TẤT CẢ'), 'bo loc muc')
+await frame(2)
+
+suite('Lo trinh')
+await click(await byText('.hm-nav-links a', 'LỘ TRÌNH'), 'lien ket Lo trinh')
+await frame(2)
+ok($('.roadmap') != null, 'mo duoc trang lo trinh')
+eq(window.location.hash, '#/lo-trinh', 'dia chi doi theo trang')
+eq($$('.rm-stage').length, 3, 'co ba chang')
+eq($$('.rm-card').length, 8, 'du 8 bai xep vao ba chang')
+eq(
+  $$('.rm-stage-count').map((e) => e.textContent),
+  ['0 / 4 BÀI', '0 / 3 BÀI', '0 / 1 BÀI'],
+  'dem bai tung chang theo dung do kho',
+)
+ok(textOf('.hm-head-side').includes('0 / 8'), 'chua choi xong bai nao', textOf('.hm-head-side'))
+ok($('.rm-progress') != null, 'co thanh tien do')
+
+await click(await byText('.hm-nav-links a', 'TRANG CHỦ'), 've trang chu')
+await frame(2)
+ok($('.home') != null, 'quay lai duoc trang chu')
+
 suite('Vao phong luyen')
 await click(await byText('.hm-btn', 'VÀO PHÒNG LUYỆN'), 'nut vao phong luyen tren thanh dieu huong')
 await frame(2)
@@ -329,14 +372,18 @@ eq(textOf('.song-sub'), 'Dân ca Pháp', 'hien tac gia')
 ok($('canvas.stage-canvas') != null, 'co canvas man hinh choi')
 ok(textOf('.progress-label').includes('1/12'), 'thanh tien do: o nhip 1/12', textOf('.progress-label'))
 ok($('.banner') == null, 'khong con bang bao "dang tai"')
-eq($$('.seg-btn.is-on').map((e) => e.textContent), ['Chờ bé bấm', 'Tay phải'], 'mac dinh: cho be bam + tay phai')
+eq(
+  $$('.seg-btn.is-on').map((e) => e.textContent),
+  ['CHỜ BÉ BẤM', 'TAY PHẢI', 'NỐT RƠI'],
+  'mac dinh: cho be bam + tay phai + man not roi',
+)
 
 suite('Ve canvas')
 await frame(3)
 ok(drawCalls.length > 100, `ve duoc ${drawCalls.length} lenh canvas`)
 ok(drawCalls.includes('fillRect'), 'co to nen')
 ok(drawCalls.includes('fillText'), 'co viet ten not len phim')
-ok(drawCalls.includes('stroke') && drawCalls.includes('fill'), 'co ve phim dan')
+ok(drawCalls.includes('strokeRect') && drawCalls.includes('fillRect'), 'co ve phim dan (goc vuong)')
 const canvas = $('canvas.stage-canvas') as HTMLCanvasElement
 ok(canvas.width > 1000 && canvas.height > 600, `canvas dung kich thuoc ${canvas.width}x${canvas.height}`)
 
@@ -352,12 +399,12 @@ const before = oscCount
 await key('keydown', 'KeyM') // Si4 - sai
 await key('keyup', 'KeyM')
 await frame(12) // cho vong ve cap nhat thanh diem (120ms/lan)
-ok(textOf('.chip-bad').includes('Sai 1'), 'bam sai thi hien "Sai 1"', textOf('.score'))
+ok(textOf('.chip-bad').includes('SAI 1'), 'bam sai thi hien "SAI 1"', textOf('.pl-tags'))
 await key('keydown', 'KeyZ') // Do4 - dung
 await key('keyup', 'KeyZ')
 await frame(30)
 ok(oscCount > before, 'phim may tinh co ra tieng')
-ok(!textOf('.chip-bad').includes('Sai 2'), 'bam dung khong bi tinh sai')
+ok(!textOf('.chip-bad').includes('SAI 2'), 'bam dung khong bi tinh sai')
 
 suite('Bam chuot len phim dan')
 const oscBefore = oscCount
@@ -386,21 +433,51 @@ await frame(2)
 ok(textOf('.progress-label').includes('1/12'), 've dau bai', textOf('.progress-label'))
 
 suite('Doi che do & tay')
-await click(await byText('.seg-btn', 'Nghe mẫu'), 'che do nghe mau')
+await click(await byText('.seg-btn', 'NGHE MẪU'), 'che do nghe mau')
 await frame(2)
-eq($$('.seg-btn.is-on').map((e) => e.textContent)[0], 'Nghe mẫu', 'doi sang che do nghe mau')
-await click(await byText('.seg-btn', 'Hai tay'), 'hai tay')
+eq($$('.seg-btn.is-on').map((e) => e.textContent)[0], 'NGHE MẪU', 'doi sang che do nghe mau')
+await click(await byText('.seg-btn', 'HAI TAY'), 'hai tay')
 await frame(2)
-await click(await byText('.seg-btn', 'Chờ bé bấm'), 've lai che do cho')
+await click(await byText('.seg-btn', 'CHỜ BÉ BẤM'), 've lai che do cho')
 await frame(2)
-eq($$('.seg-btn.is-on').map((e) => e.textContent), ['Chờ bé bấm', 'Hai tay'], 'giu dung lua chon')
+eq(
+  $$('.seg-btn.is-on').map((e) => e.textContent),
+  ['CHỜ BÉ BẤM', 'HAI TAY', 'NỐT RƠI'],
+  'giu dung lua chon',
+)
+
+suite('Xem ban nhac (khuong nhac)')
+await click(await byText('.seg-btn', 'BẢN NHẠC'), 'doi sang xem ban nhac')
+await frame(3)
+ok($('.sheet') != null, 'hien khung ban nhac')
+ok($$('.sheet-system').length > 0, `ve ${$$('.sheet-system').length} dong khuong nhac`)
+ok($('.stage.is-keys-only') != null, 'ban phim thu lai chi con dai phim')
+ok($('canvas.stage-canvas') != null, 'van con canvas ban phim (vong ve chay o day)')
+await click(await byText('.seg-btn', 'NỐT RƠI'), 've lai man not roi')
+await frame(2)
+ok($('.sheet') == null, 'tat khung ban nhac')
+ok($('.stage.is-keys-only') == null, 'ban phim tro lai binh thuong')
+
+suite('Dich giong')
+const stepUp = $$('.pl-step')[1].querySelectorAll('button')[1] as HTMLElement
+const stepDown = $$('.pl-step')[1].querySelectorAll('button')[0] as HTMLElement
+await click(stepUp, 'nang nua cung')
+await frame(2)
+eq($$('.pl-step b')[1].textContent, '+1', 'nang len hien "+1"')
+await click(stepDown, 'ha lai')
+await click(stepDown, 'ha them nua cung')
+await frame(2)
+eq($$('.pl-step b')[1].textContent, '−1', 'ha xuong con "−1"')
+await click(stepUp, 've giong goc')
+await frame(2)
+eq($$('.pl-step b')[1].textContent, 'GỐC', 've dung giong goc')
 
 suite('Bang cai dat')
-await click(await byText('.btn', '⚙ Cài đặt'), 'nut cai dat')
+await click(await byText('.btn', '⚙ CÀI ĐẶT'), 'nut cai dat')
 ok($('.panel') != null, 'mo duoc bang cai dat')
-await click(await byText('.seg-btn', 'C D E'), 'nhan phim chu cai')
+await click(await byText('.panel .seg-btn', 'C D E'), 'nhan phim chu cai')
 await frame(2)
-await click(await byText('.seg-btn', 'Đô Rê Mi'), 'nhan phim solfege')
+await click(await byText('.panel .seg-btn', 'ĐÔ RÊ MI'), 'nhan phim solfege')
 await frame(2)
 const wide = $$('.panel input[type=checkbox]')
 ok(wide.length >= 4, `co ${wide.length} o tich trong cai dat`)
@@ -417,7 +494,7 @@ const look = $$('.panel input[type=range]')[0]
 await setRange(look, 14)
 await frame(2)
 ok(true, 'keo duoc thanh "nhin truoc"')
-await click(await byText('.btn', '⚙ Cài đặt'), 'dong cai dat')
+await click(await byText('.btn', '⚙ CÀI ĐẶT'), 'dong cai dat')
 
 suite('Doi bai')
 await click($('.song-btn'), 'nut chon bai')
@@ -436,7 +513,7 @@ await click(await byText('.btn', '?'), 'nut huong dan')
 ok($('.modal') != null, 'mo duoc huong dan')
 await key('keydown', 'Escape')
 ok($('.modal') == null, 'Escape dong huong dan')
-await click(await byText('.btn', '⚙ Cài đặt'), 'mo cai dat')
+await click(await byText('.btn', '⚙ CÀI ĐẶT'), 'mo cai dat')
 await click(await byText('.btn', 'Thêm bài'), 'nut them bai')
 ok($('.modal') != null, 'mo duoc hop thoai them bai')
 ok($('.dropzone') != null, 'co vung tha tep')
@@ -444,7 +521,7 @@ await key('keydown', 'Escape')
 ok($('.modal') == null, 'Escape dong hop thoai them bai')
 
 suite('Ve trang chu roi quay lai')
-await click($('.home-btn'), 'dau hieu PHIM tren thanh tren')
+await click($('.topbar .hm-brand'), 'dau hieu PHIM tren thanh tren')
 await frame(2)
 ok($('.home') != null, 've duoc trang chu')
 ok($('.topbar') == null, 'phong luyen da dong')

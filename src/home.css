@@ -1,130 +1,24 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   Trang chu — he thiet ke "Modernist" nhap tu claude.ai/design
-   (Trang Chu.dc.html + _ds/modernist.../styles.css).
+   Trang chu — theo ban thiet ke "Trang Chu.dc.html" (he Modernist).
 
-   Dac trung: nen gan den #131211, chu Archivo dam, GOC VUONG TUYET DOI
-   (radius = 0), duong ke manh 1px trang mo, mot mau nhan do cam duy nhat.
-
-   Moi lop deu co tien to `hm-` de khong dung ten voi giao dien phong luyen
-   trong styles.css (.btn, .seg, .chip, .panel...).
+   Pho chu, bien mau, thanh dieu huong, nut va chan trang nam o site.css.
+   Tep nay chi giu phan rieng cua trang chu: hero, hop minh hoa, so lieu,
+   ba buoc, lo trinh rut gon va dai keu goi cuoi trang.
    ══════════════════════════════════════════════════════════════════════ */
-
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-weight: 400 800;
-  font-display: swap;
-  src: url('./fonts/archivo-vietnamese.woff2') format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301,
-    U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-weight: 400 800;
-  font-display: swap;
-  src: url('./fonts/archivo-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
-    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-weight: 400 800;
-  font-display: swap;
-  src: url('./fonts/archivo-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* ------------------------------------------------------------------ token */
-
-.home {
-  --color-bg: #131211;
-  --color-text: #efedec;
-  --color-accent: #ec3013;
-  --color-accent-600: #ff5a3d;
-  --color-accent-700: #ff7a5c;
-  --n-100: rgba(255, 255, 255, 0.055);
-  --n-200: rgba(255, 255, 255, 0.09);
-  --n-300: rgba(255, 255, 255, 0.16);
-  --n-400: rgba(255, 255, 255, 0.28);
-  --n-500: rgba(255, 255, 255, 0.45);
-  --n-600: rgba(255, 255, 255, 0.58);
-  --n-700: rgba(255, 255, 255, 0.76);
-  --line: rgba(255, 255, 255, 0.16);
-  --font-h: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-  --font-b: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-  --wrap: 1560px;
-  --pad-x: clamp(20px, 4vw, 48px);
-
-  min-height: 100vh;
-  background:
-    radial-gradient(1100px 560px at 82% -6%, rgba(236, 48, 19, 0.13), transparent 60%),
-    var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-b);
-  font-size: 15px;
-  line-height: 1.55;
-}
-
-.home *,
-.home *::before,
-.home *::after {
-  box-sizing: border-box;
-}
-
-.home a {
-  color: var(--color-text);
-  text-decoration: none;
-  cursor: pointer;
-}
-.home a:hover {
-  color: var(--color-accent);
-}
-.home button:focus-visible,
-.home a:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-.home ::selection {
-  background: rgba(236, 48, 19, 0.28);
-}
-.home h1,
-.home h2,
-.home h3 {
-  font-family: var(--font-h);
-  margin: 0;
-}
-
-.hm-wrap {
-  max-width: var(--wrap);
-  margin: 0 auto;
-}
 
 /* ------------------------------------------------------------------ chuyen dong */
 
-@keyframes hm-rise {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
 @keyframes hm-keyflash {
   0%,
   100% {
-    background: #f6f4f3;
+    background: var(--key-white);
   }
   6%,
   22% {
     background: var(--color-accent);
   }
   32% {
-    background: #f6f4f3;
+    background: var(--key-white);
   }
 }
 @keyframes hm-dotflash {
@@ -158,195 +52,6 @@
     top: 100%;
     opacity: 0.9;
   }
-}
-
-.hm-rise {
-  animation: hm-rise 0.6s ease both;
-}
-.hm-rise-2 {
-  animation: hm-rise 0.6s ease 0.15s both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home *,
-  .home *::before,
-  .home *::after {
-    animation: none !important;
-  }
-}
-
-/* ------------------------------------------------------------------ thanh dieu huong */
-
-.hm-nav {
-  display: flex;
-  align-items: center;
-  gap: clamp(14px, 2.5vw, 36px);
-  padding: 0 var(--pad-x);
-  height: 58px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(19, 18, 17, 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  white-space: nowrap;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.hm-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  font-size: 19px;
-  letter-spacing: 0.01em;
-  flex: none;
-}
-.hm-brand:hover {
-  color: var(--color-text);
-}
-.hm-brand-mark {
-  width: 22px;
-  height: 22px;
-  background: var(--color-accent);
-  display: inline-block;
-}
-.hm-dot {
-  color: var(--color-accent);
-}
-
-.hm-nav-links {
-  display: flex;
-  gap: clamp(12px, 1.8vw, 26px);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.hm-nav-links::-webkit-scrollbar {
-  display: none;
-}
-.hm-nav-links a.is-current {
-  color: var(--color-accent);
-  border-bottom: 2px solid var(--color-accent);
-  padding-bottom: 2px;
-}
-
-.hm-nav-right {
-  margin-left: auto;
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  flex: none;
-}
-.hm-link-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--color-text);
-  font-family: var(--font-b);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.hm-link-btn:hover {
-  color: var(--color-accent);
-}
-
-/* ------------------------------------------------------------------ nut */
-
-.hm-btn {
-  border: none;
-  background: var(--color-accent);
-  color: #fff;
-  font-family: var(--font-b);
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  padding: 11px 20px;
-  cursor: pointer;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-.hm-btn:hover {
-  background: var(--color-accent-600);
-  color: #fff;
-}
-
-.hm-btn-lg {
-  background: var(--color-accent);
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  padding: 16px 26px;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  white-space: nowrap;
-  border: none;
-  font-family: var(--font-b);
-  cursor: pointer;
-  box-shadow: 0 8px 34px rgba(236, 48, 19, 0.4);
-}
-.hm-btn-lg:hover {
-  background: var(--color-accent-600);
-  color: #fff;
-}
-.hm-btn-lg svg {
-  display: block;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.5;
-}
-
-.hm-btn-ghost {
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: none;
-  color: var(--color-text);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  padding: 14px 26px;
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-  font-family: var(--font-b);
-  cursor: pointer;
-}
-.hm-btn-ghost:hover {
-  background: var(--n-200);
-  color: var(--color-text);
-}
-
-.hm-kicker {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  color: var(--color-accent);
-}
-
-.hm-more {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--color-accent);
-  background: none;
-  border: none;
-  padding: 0;
-  font-family: var(--font-b);
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
-}
-.hm-more:hover {
-  color: var(--color-accent-600);
 }
 
 /* ------------------------------------------------------------------ hero */
@@ -424,7 +129,7 @@
   bottom: 0;
   width: 12.5%;
   left: calc(var(--i) * 12.5%);
-  background: #f6f4f3;
+  background: var(--key-white);
   border-right: 1px solid #d8d6d4;
   animation: hm-keyflash 4.8s infinite;
   animation-delay: calc(var(--i) * 0.45s);
@@ -721,7 +426,6 @@
   cursor: pointer;
 }
 .hm-btn-white:hover {
-  background: var(--n-100);
   background: #f8f4f4;
   color: var(--color-accent-700);
 }
@@ -741,41 +445,6 @@
 .hm-btn-outline:hover {
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
-}
-
-/* ------------------------------------------------------------------ chan trang */
-
-.hm-foot {
-  border-top: 1px solid var(--line);
-  padding: 24px var(--pad-x);
-  display: flex;
-  align-items: center;
-  gap: clamp(14px, 2vw, 28px);
-  flex-wrap: wrap;
-  max-width: var(--wrap);
-  margin: 0 auto;
-}
-.hm-foot-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 800;
-  font-size: 15px;
-}
-.hm-foot-brand .hm-brand-mark {
-  width: 16px;
-  height: 16px;
-}
-.hm-foot a,
-.hm-foot .hm-link-btn {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-}
-.hm-foot-note {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--n-600);
 }
 
 /* ------------------------------------------------------------------ man hinh nho */
@@ -816,20 +485,6 @@
 }
 
 @media (max-width: 720px) {
-  .hm-nav {
-    gap: 14px;
-    padding: 0 16px;
-  }
-  .hm-nav-links {
-    font-size: 12px;
-  }
-  .hm-nav-right .hm-link-btn {
-    display: none;
-  }
-  .hm-btn {
-    padding: 9px 14px;
-    font-size: 11px;
-  }
   .hm-stats {
     grid-template-columns: 1fr;
   }
@@ -845,19 +500,9 @@
   .hm-lead {
     font-size: 16px;
   }
-  .hm-foot-note {
-    margin-left: 0;
-    width: 100%;
-  }
 }
 
-/* Man hinh dien thoai: bo hang lien ket tren thanh dieu huong. Cho no co lai
-   thi chu bi cat do dang sau cai nut, ma mo hai muc "luyen tap" / "thu vien"
-   nam ngay duoi phan mo dau va o chan trang roi. */
 @media (max-width: 560px) {
-  .hm-nav-links {
-    display: none;
-  }
   .hm-demo-foot {
     flex-wrap: wrap;
   }
