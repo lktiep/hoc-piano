@@ -4,6 +4,7 @@ import { Metronome } from './audio/metronome'
 import { Player } from './engine/player'
 import { Stage } from './components/Stage'
 import { Controls } from './components/Controls'
+import { Home } from './components/Home'
 import { SongPicker } from './components/SongPicker'
 import { ImportDialog } from './components/ImportDialog'
 import { HelpDialog } from './components/HelpDialog'
@@ -15,6 +16,16 @@ import type { Settings, Song, SongIndexEntry } from './types'
 
 const SETTINGS_KEY = 'hoc-piano.settings.v2'
 const LAST_SONG_KEY = 'hoc-piano.lastSong.v1'
+
+/** Hai trang: trang chu gioi thieu va phong luyen. Dinh tuyen bang dau `#` de
+ *  chay duoc tren moi may chu tinh (GitHub Pages, Cloudflare, file://). */
+type Route = 'home' | 'player'
+const PLAYER_HASH = '#/luyen-tap'
+
+function routeFromHash(): Route {
+  if (typeof window === 'undefined') return 'home'
+  return window.location.hash.replace(/^#\/?/, '').startsWith('luyen-tap') ? 'player' : 'home'
+}
 
 const DEFAULT_SETTINGS: Settings = {
   mode: 'wait',
@@ -60,6 +71,7 @@ export default function App() {
   const metroRef = useRef<Metronome | null>(null)
   if (!metroRef.current) metroRef.current = new Metronome(synthRef.current)
 
+  const [route, setRoute] = useState<Route>(routeFromHash)
   const [settings, setSettings] = useState<Settings>(readSettings)
   const playerRef = useRef<Player | null>(null)
   if (!playerRef.current) playerRef.current = new Player(synthRef.current, metroRef.current, settings)
@@ -130,11 +142,43 @@ export default function App() {
     )
     midiRef.current = input
     setMidiStatus({ ...input.status })
-    void input.connect()
     return () => {
       midiRef.current = null
     }
   }, [player])
+
+  // Chi xin quyen MIDI khi be that su vao phong luyen, khong hoi ngay o trang chu.
+  useEffect(() => {
+    if (route === 'player') void midiRef.current?.connect()
+  }, [route])
+
+  // ------------------------------------------------------------- dinh tuyen
+  // Nut Back cua trinh duyet: chi doi trang khi that su khac, khong ve lai thua.
+  const routeRef = useRef(route)
+  routeRef.current = route
+  useEffect(() => {
+    const onHash = () => {
+      const next = routeFromHash()
+      if (next !== routeRef.current) setRoute(next)
+    }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  // Roi phong luyen thi tat tieng dan, khong de bai chay ngam.
+  useEffect(() => {
+    if (route !== 'player') {
+      player.pause()
+      player.releaseAll()
+    }
+  }, [player, route])
+
+  const go = useCallback((next: Route) => {
+    setRoute(next)
+    const hash = next === 'player' ? PLAYER_HASH : '#/'
+    if (window.location.hash !== hash) window.location.hash = hash
+    document.documentElement.scrollTop = 0
+  }, [])
 
   // -------------------------------------------------------- ban phim may tinh
   const range = useMemo<[number, number]>(() => {
@@ -154,6 +198,7 @@ export default function App() {
   baseCRef.current = baseC
 
   useEffect(() => {
+    if (route !== 'player') return
     const isTyping = (t: EventTarget | null) => {
       const el = t as HTMLElement | null
       return !!el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)
@@ -191,7 +236,7 @@ export default function App() {
       window.removeEventListener('keyup', up)
       window.removeEventListener('blur', blur)
     }
-  }, [player])
+  }, [player, route])
 
   // ------------------------------------------------------------------ actions
   const onUiTick = useCallback(() => forceTick((v) => v + 1), [])
@@ -232,7 +277,36 @@ export default function App() {
     [song],
   )
 
+  /** Trang chu bam thang vao mot bai cu the (vi du "Thu ngay" o hop minh hoa). */
+  const openSong = useCallback(
+    (id: string) => {
+      const entry = index.find((e) => e.id === id) ?? localSongs.find((s) => s.id === id)
+      if (entry) void pickSong(entry)
+      go('player')
+    },
+    [go, index, localSongs, pickSong],
+  )
+
   const totalMeasures = player.timeline?.measureCount ?? 1
+
+  if (route === 'home') {
+    return (
+      <Home
+        index={index}
+        localSongs={localSongs}
+        onEnterPlayer={() => go('player')}
+        onOpenLibrary={() => {
+          setShowPicker(true)
+          go('player')
+        }}
+        onOpenImport={() => {
+          setShowImport(true)
+          go('player')
+        }}
+        onOpenSong={openSong}
+      />
+    )
+  }
 
   return (
     <div className="app">
@@ -247,6 +321,7 @@ export default function App() {
         onOpenPicker={() => setShowPicker(true)}
         onOpenImport={() => setShowImport(true)}
         onOpenHelp={() => setShowHelp(true)}
+        onGoHome={() => go('home')}
         wideKeyboard={wideKeyboard}
         setWideKeyboard={setWideKeyboard}
         onChanged={onUiTick}

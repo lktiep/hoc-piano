@@ -24,10 +24,35 @@ Các lệnh khác:
 | `npm run dev` | chạy thử ở máy |
 | `npm run build` | dựng bản chạy thật vào `dist/` |
 | `npm run preview` | xem thử bản đã dựng |
-| `npm test` | chạy toàn bộ 158 bài kiểm thử |
+| `npm test` | chạy toàn bộ 180 bài kiểm thử |
 | `npm run typecheck` | kiểm tra kiểu TypeScript |
 | `npm run songs` | sinh lại các bài có sẵn trong `public/songs/` |
 | `npm run import -- <tệp>` | nạp một bản nhạc mới vào kho bài |
+
+---
+
+## Hai trang
+
+| Địa chỉ | Trang |
+| --- | --- |
+| `#/` | **Trang chủ** — giới thiệu, lộ trình ba mức, các lối vào nhanh |
+| `#/luyen-tap` | **Phòng luyện** — nốt rơi, bàn phím to, thanh điều khiển |
+
+Định tuyến bằng dấu `#` nên chạy được trên mọi máy chủ tĩnh (kể cả mở thẳng
+`dist/index.html` bằng trình duyệt), không cần cấu hình rewrite. Bấm dấu hiệu
+**PHÍM.** ở góc trái thanh trên là về lại trang chủ; rời phòng luyện thì nhạc
+tự dừng và nhả hết phím.
+
+Trang chủ dựng theo bản thiết kế `Trang Chu.dc.html` (hệ **Modernist**: nền
+`#131211`, chữ Archivo đậm, góc vuông tuyệt đối, một màu nhấn `#ec3013`). Mọi
+con số trên trang đều lấy từ dữ liệu thật — số bài đếm từ `public/songs/index.json`
+cộng các bài bé tự thêm, ba mức lộ trình đếm theo `level` của từng bài — nên
+thêm bài là trang chủ tự đổi theo, không có con số nào viết cứng.
+
+Phông **Archivo** để sẵn trong `src/fonts/` (ba tệp `.woff2` cắt theo bảng chữ:
+Việt / Latin mở rộng / Latin, giấy phép SIL OFL 1.1) chứ không gọi ra Google
+Fonts, để trang vẫn đúng kiểu chữ khi mất mạng. Để trong `src/` chứ không phải
+`public/` để Vite sinh đường dẫn tương đối, chạy được ở thư mục con của GitHub Pages.
 
 ---
 
@@ -151,9 +176,10 @@ npm test
 - `scripts/selftest.ts` — 117 phép thử phần lõi: hình học phím đàn, đổi phách↔giây,
   cả ba chế độ chơi, lặp đoạn, gõ nhịp, đổi tốc độ, đọc MusicXML (kể cả dấu nhắc lại
   và dấu nối), đọc tệp MIDI, và kiểm tra mọi bài trong `public/songs/`.
-- `scripts/uitest.ts` — 41 phép thử **cả giao diện thật** trong DOM giả (jsdom):
-  mount app, vẽ canvas, bấm nút, gõ phím, bấm chuột lên phím đàn, mở/đóng hộp thoại,
-  chạy 600 khung hình liên tục và bắt mọi lỗi lúc chạy.
+- `scripts/uitest.ts` — 63 phép thử **cả giao diện thật** trong DOM giả (jsdom):
+  mount app, kiểm tra trang chủ (số liệu phải khớp kho bài thật), đi qua lại giữa
+  trang chủ và phòng luyện, vẽ canvas, bấm nút, gõ phím, bấm chuột lên phím đàn,
+  mở/đóng hộp thoại, chạy 600 khung hình liên tục và bắt mọi lỗi lúc chạy.
 
 Cả hai chạy tự động trên GitHub Actions ở mỗi lần push.
 
@@ -188,8 +214,11 @@ kể cả mở thẳng `dist/index.html` bằng trình duyệt, hoặc đặt l�
 
 ```
 src/
-  App.tsx              gắn mọi thứ lại với nhau, phím tắt, lưu cài đặt
+  App.tsx              gắn mọi thứ lại với nhau, định tuyến #/, phím tắt, lưu cài đặt
   types.ts             mô hình dữ liệu bài hát (thời gian tính bằng PHÁCH, không phải giây)
+  styles.css           giao diện phòng luyện
+  home.css             giao diện trang chủ (mọi lớp mang tiền tố `hm-`)
+  fonts/               phông Archivo cắt sẵn, dùng ngoại tuyến
   engine/
     timeline.ts        đổi phách ↔ giây, có bản đồ tempo và vạch nhịp
     player.ts          bộ chơi: cổng nốt, chờ bấm đúng, chấm điểm, lặp đoạn
@@ -206,6 +235,7 @@ src/
     webmidi.ts         đàn piano điện qua Web MIDI
     keymap.ts          bàn phím máy tính
   components/
+    Home.tsx           trang chủ — số liệu và lộ trình lấy từ kho bài thật
     Stage.tsx          MỘT canvas vẽ cả nốt rơi lẫn bàn phím (khớp cột tuyệt đối, 60fps)
     Controls.tsx       thanh điều khiển + bảng cài đặt
     SongPicker.tsx     chọn bài

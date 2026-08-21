@@ -14,6 +14,7 @@ export interface ControlsProps {
   onOpenPicker: () => void
   onOpenImport: () => void
   onOpenHelp: () => void
+  onGoHome: () => void
   wideKeyboard: boolean
   setWideKeyboard: (v: boolean) => void
   onChanged: () => void
@@ -54,6 +55,13 @@ export function Controls(props: ControlsProps) {
   return (
     <header className="topbar">
       <div className="topbar-main">
+        <button className="home-btn" onClick={props.onGoHome} title="Về trang chủ">
+          <span className="home-mark" />
+          <span className="home-word">
+            PHÍM<i>.</i>
+          </span>
+        </button>
+
         <button className="song-btn" onClick={props.onOpenPicker} title="Chọn bài khác">
           <span className="song-title">{song ? song.title : 'Chọn bài…'}</span>
           <span className="song-sub">{song?.artist ? song.artist : 'Bấm để đổi bài'}</span>

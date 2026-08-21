@@ -55,6 +55,43 @@ body {
   flex-wrap: wrap;
 }
 
+/* Dau hieu thuong hieu, bam de ve trang chu. */
+.home-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--fg);
+  flex: 0 0 auto;
+}
+
+.home-btn:hover {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.home-mark {
+  width: 16px;
+  height: 16px;
+  background: #ec3013;
+  display: inline-block;
+}
+
+.home-word {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.home-word i {
+  color: #ec3013;
+  font-style: normal;
+}
+
 .song-btn {
   display: flex;
   flex-direction: column;
@@ -722,6 +759,10 @@ body {
 @media (max-width: 860px) {
   .song-btn {
     max-width: 100%;
+  }
+
+  .home-word {
+    display: none;
   }
 
   .topbar-main {
